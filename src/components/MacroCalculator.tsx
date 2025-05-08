@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Calculator, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -147,8 +146,8 @@ const MacroCalculator: React.FC = () => {
                     className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     required
                   >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
+                    <option value="male" className="bg-black text-white">Male</option>
+                    <option value="female" className="bg-black text-white">Female</option>
                   </select>
                 </div>
                 
@@ -192,10 +191,10 @@ const MacroCalculator: React.FC = () => {
                     className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     required
                   >
-                    <option value="sedentary">Sedentary (office job, little exercise)</option>
-                    <option value="light">Light (light exercise 1-3 days/week)</option>
-                    <option value="moderate">Moderate (moderate exercise 3-5 days/week)</option>
-                    <option value="very">Very Active (hard exercise 6-7 days/week)</option>
+                    <option value="sedentary" className="bg-black text-white">Sedentary (office job, little exercise)</option>
+                    <option value="light" className="bg-black text-white">Light (light exercise 1-3 days/week)</option>
+                    <option value="moderate" className="bg-black text-white">Moderate (moderate exercise 3-5 days/week)</option>
+                    <option value="very" className="bg-black text-white">Very Active (hard exercise 6-7 days/week)</option>
                   </select>
                 </div>
                 
@@ -208,9 +207,9 @@ const MacroCalculator: React.FC = () => {
                     className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     required
                   >
-                    <option value="lose">Lose Fat</option>
-                    <option value="maintain">Maintain</option>
-                    <option value="gain">Gain Muscle</option>
+                    <option value="lose" className="bg-black text-white">Lose Fat</option>
+                    <option value="maintain" className="bg-black text-white">Maintain</option>
+                    <option value="gain" className="bg-black text-white">Gain Muscle</option>
                   </select>
                 </div>
                 

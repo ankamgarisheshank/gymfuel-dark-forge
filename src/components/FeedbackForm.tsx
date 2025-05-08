@@ -1,7 +1,7 @@
-
 import React, { useState } from "react";
 import { Send, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import emailjs from '@emailjs/browser';
 
 const FeedbackForm: React.FC = () => {
   const { toast } = useToast();
@@ -11,7 +11,7 @@ const FeedbackForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name || !email || !message) {
@@ -24,18 +24,36 @@ const FeedbackForm: React.FC = () => {
     }
     
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      console.log("Feedback submitted:", { name, email });
-      
-      setIsSubmitting(false);
-      setIsSubmitted(true);
+
+    try {
+      // Send email notification using EmailJS
+      const templateParams = {
+        from_name: name,
+        from_email: email,
+        message: message,
+        to_name: "Your Name" // Your name that will appear in the email
+      };
+
+      // Replace these with your actual EmailJS credentials
+      const serviceID = 'service_epraxvt';
+      const templateID = 'template_nryo4av';
+      const userID = 'dd0rkUnPcREMEKLjs';
+
+      await emailjs.send(
+        serviceID,
+        templateID,
+        templateParams,
+        userID
+      );
+
+      console.log("Feedback submitted:", { name, email, message });
       
       toast({
         title: "Feedback Submitted!",
         description: "Thank you for your valuable feedback.",
       });
+
+      setIsSubmitted(true);
       
       // Reset form after delay
       setTimeout(() => {
@@ -44,7 +62,16 @@ const FeedbackForm: React.FC = () => {
         setMessage("");
         setIsSubmitted(false);
       }, 3000);
-    }, 1500);
+    } catch (error) {
+      console.error("Failed to submit feedback:", error);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your feedback. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
