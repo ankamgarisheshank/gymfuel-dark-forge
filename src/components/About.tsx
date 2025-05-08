@@ -23,7 +23,7 @@ const About: React.FC = () => {
       <div className="container mx-auto relative z-10">
         <div className="flex flex-col items-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-3 animate-pulse-light">
-            About <span className="gym-gradient bg-clip-text text-transparent">GymFuel</span>
+            Abouttttttt <span className="gym-gradient bg-clip-text text-transparent">GymFuel</span>
           </h2>
           <div className="w-20 h-1 bg-gym-red rounded-full"></div>
         </div>
