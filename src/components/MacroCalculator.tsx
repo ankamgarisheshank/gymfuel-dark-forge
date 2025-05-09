@@ -21,20 +21,32 @@ const MacroCalculator: React.FC = () => {
   const [results, setResults] = useState<MacroResults | null>(null);
   const [showResults, setShowResults] = useState(false);
 
-  const sendTelegramNotification = async (userName: string) => {
-    try {
-      await fetch('/.netlify/functions/telegram-notify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: userName }),
-      });
-      console.log('Telegram notification sent for:', userName);
-    } catch (error) {
-      console.error('Failed to send Telegram notification:', error);
+ const sendTelegramNotification = async (userName: string) => {
+  try {
+    console.log("Attempting to send notification for:", userName);
+    
+    const response = await fetch('/.netlify/functions/telegram-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: userName }),
+    });
+
+    const result = await response.json();
+    console.log("Notification response:", result);
+
+    if (!response.ok) {
+      throw new Error(result.error || "Notification failed");
     }
-  };
+    return true;
+  } catch (error) {
+    console.error("Notification error:", {
+      error: error.message,
+      userName: userName,
+      time: new Date().toISOString()
+    });
+    return false;
+  }
+};
 
   const calculateMacros = async (e: React.FormEvent) => {
     e.preventDefault();

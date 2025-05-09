@@ -1,68 +1,64 @@
-const fetch = require('node-fetch'); // Only needed for Node <18
+const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-  // Debug: Log incoming request
-  console.log('Request received:', JSON.stringify(event));
-
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Only POST requests allowed' })
-    };
-  }
-
+  // Debug: Full request log
+  console.log("Incoming request body:", event.body);
+  
   try {
-    // Parse request body
+    // Parse the incoming data
     const { name } = JSON.parse(event.body);
-    if (!name) throw new Error('Name is required');
+    if (!name) throw new Error("Name is required");
 
-    // Get credentials from environment variables
+    // Get credentials from environment
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = Number(process.env.TELEGRAM_CHAT_ID); // Convert to number
+    const chatId = Number(process.env.TELEGRAM_CHAT_ID); // Must be number!
+    
+    // Debug: Verify credentials (partial token for security)
+    console.log("Using Token:", botToken?.slice(0, 5) + "...");
+    console.log("Using Chat ID:", chatId);
 
-    // Debug: Verify credentials (logs will appear in Netlify dashboard)
-    console.log('Bot token:', botToken?.slice(0, 5) + '...'); // Partial log for security
-    console.log('Chat ID:', chatId);
-
-    if (!botToken || !chatId) {
-      throw new Error('Missing Telegram credentials in environment variables');
-    }
-
-    // Prepare message
-    const message = `📊 ${name} just used your macro calculator!`;
+    const message = `📊 ${name} used your macro calculator!`;
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
-    // Send to Telegram
+    // Debug: Final request details
+    console.log("Sending to Telegram:", url);
+    console.log("Message content:", message);
+
     const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         chat_id: chatId,
-        text: message
+        text: message,
+        parse_mode: "HTML"
       })
     });
 
     const data = await response.json();
-    console.log('Telegram response:', data);
+    console.log("Telegram API response:", data);
 
     if (!response.ok) {
-      throw new Error(`Telegram error: ${data.description || 'Unknown error'}`);
+      throw new Error(data.description || "Telegram API error");
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, message: 'Notification sent!' })
+      body: JSON.stringify({ success: true })
     };
 
   } catch (error) {
-    console.error('Error:', error);
+    // Detailed error logging
+    console.error("FULL ERROR:", {
+      message: error.message,
+      stack: error.stack,
+      receivedEvent: event
+    });
+    
     return {
       statusCode: 500,
-      body: JSON.stringify({ 
-        success: false,
+      body: JSON.stringify({
         error: error.message,
-        tip: 'Check Netlify function logs for details'
+        details: "Check Netlify function logs"
       })
     };
   }
