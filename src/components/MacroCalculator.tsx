@@ -21,7 +21,45 @@ const MacroCalculator: React.FC = () => {
   const [results, setResults] = useState<MacroResults | null>(null);
   const [showResults, setShowResults] = useState(false);
 
-  const calculateMacros = (e: React.FormEvent) => {
+  const sendNotificationToOwner = async (userName: string) => {
+    try {
+      // This would be your notification service endpoint
+      await fetch('https://your-notification-service.com/api/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `${userName} has used your macro calculator!`,
+          to: "ankamgarisheshank@gmai.com" // Your email or notification target
+        }),
+      });
+      console.log(`Notification sent about: ${userName}`);
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
+
+  const logCalculatorUsage = async (userName: string) => {
+    try {
+      // Send only the name to your logging endpoint
+      await fetch('https://your-logging-api-endpoint.com/calculator-usage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: userName }),
+      });
+      console.log(`Macro calculation requested by: ${userName}`);
+      
+      // Send notification to owner
+      await sendNotificationToOwner(userName);
+    } catch (error) {
+    console.error('Error logging calculator usage:', error);
+  }
+};
+
+  const calculateMacros = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const weightKg = parseFloat(weight);
@@ -36,6 +74,9 @@ const MacroCalculator: React.FC = () => {
       });
       return;
     }
+
+    // Log the user's name and notify owner
+    await logCalculatorUsage(name);
 
     // BMR calculation using Mifflin-St Jeor Equation
     let bmr: number;
@@ -75,9 +116,6 @@ const MacroCalculator: React.FC = () => {
     const carbs = Math.round((calories - (protein * 4) - (fats * 9)) / 4);
     
     setResults({ calories, protein, fats, carbs });
-    
-    // Log the user's name (not other personal data)
-    console.log(`Macro calculation requested by: ${name}`);
     
     toast({
       title: "Macros Calculated!",
