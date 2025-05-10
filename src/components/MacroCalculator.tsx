@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Calculator, Check } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Calculator, Check, Info, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface MacroResults {
@@ -7,6 +7,14 @@ interface MacroResults {
   protein: number;
   fats: number;
   carbs: number;
+}
+
+interface WeightRecommendation {
+  idealRange: string;
+  bmi: number;
+  bmiCategory: string;
+  toLose?: number;
+  toGain?: number;
 }
 
 const MacroCalculator: React.FC = () => {
@@ -19,34 +27,88 @@ const MacroCalculator: React.FC = () => {
   const [activityLevel, setActivityLevel] = useState("moderate");
   const [goal, setGoal] = useState("maintain");
   const [results, setResults] = useState<MacroResults | null>(null);
+  const [weightRecommendation, setWeightRecommendation] = useState<WeightRecommendation | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [typingText, setTypingText] = useState("");
+  const [typingComplete, setTypingComplete] = useState(false);
 
- const sendTelegramNotification = async (userName: string) => {
-  try {
-    console.log("Attempting to send notification for:", userName);
-    
-    const response = await fetch('/.netlify/functions/telegram-notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: userName }),
-    });
-
-    const result = await response.json();
-    console.log("Notification response:", result);
-
-    if (!response.ok) {
-      throw new Error(result.error || "Notification failed");
+  const sendTelegramNotification = async (userName: string) => {
+    try {
+      const response = await fetch('/.netlify/functions/telegram-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: userName }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Notification failed");
+      return true;
+    } catch (error) {
+      console.error("Notification error:", error);
+      return false;
     }
-    return true;
-  } catch (error) {
-    console.error("Notification error:", {
-      error: error.message,
-      userName: userName,
-      time: new Date().toISOString()
-    });
-    return false;
-  }
-};
+  };
+
+  // Typewriter effect for results title
+  useEffect(() => {
+    if (showResults && results) {
+      setTypingComplete(false);
+      const title = "Your Daily Macros";
+      let i = 0;
+      const typingInterval = setInterval(() => {
+        if (i < title.length) {
+          setTypingText(prev => prev + title.charAt(i));
+          i++;
+        } else {
+          clearInterval(typingInterval);
+          setTypingComplete(true);
+        }
+      }, 100);
+      return () => clearInterval(typingInterval);
+    } else {
+      setTypingText("");
+    }
+  }, [showResults, results]);
+
+  const calculateIdealWeight = (heightCm: number, gender: string): WeightRecommendation => {
+    const weightKg = parseFloat(weight);
+    const heightM = heightCm / 100;
+    const bmi = weightKg / (heightM * heightM);
+    
+    let bmiCategory = "";
+    if (bmi < 18.5) bmiCategory = "Underweight";
+    else if (bmi < 25) bmiCategory = "Normal weight";
+    else if (bmi < 30) bmiCategory = "Overweight";
+    else bmiCategory = "Obese";
+    
+    let idealMin, idealMax;
+    if (gender === "male") {
+      idealMin = 50 + 0.9 * (heightCm - 152);
+      idealMax = idealMin + 5;
+    } else if (gender === "female") {
+      idealMin = 45.5 + 0.9 * (heightCm - 152);
+      idealMax = idealMin + 5;
+    } else {
+      const maleMin = 50 + 0.9 * (heightCm - 152);
+      const femaleMin = 45.5 + 0.9 * (heightCm - 152);
+      idealMin = (maleMin + femaleMin) / 2;
+      idealMax = idealMin + 5;
+    }
+    
+    let toLose, toGain;
+    if (weightKg > idealMax) {
+      toLose = Math.round(weightKg - idealMax);
+    } else if (weightKg < idealMin) {
+      toGain = Math.round(idealMin - weightKg);
+    }
+    
+    return {
+      idealRange: `${Math.round(idealMin)} - ${Math.round(idealMax)} kg`,
+      bmi: parseFloat(bmi.toFixed(1)),
+      bmiCategory,
+      toLose,
+      toGain
+    };
+  };
 
   const calculateMacros = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,19 +126,24 @@ const MacroCalculator: React.FC = () => {
       return;
     }
 
-    // Send Telegram notification
     await sendTelegramNotification(name);
+    const recommendation = calculateIdealWeight(heightCm, gender);
+    setWeightRecommendation(recommendation);
 
-    // BMR calculation using Mifflin-St Jeor Equation
+    // BMR calculation
     let bmr: number;
     if (gender === "male") {
       bmr = 10 * weightKg + 6.25 * heightCm - 5 * ageYears + 5;
-    } else {
+    } else if (gender === "female") {
       bmr = 10 * weightKg + 6.25 * heightCm - 5 * ageYears - 161;
+    } else {
+      const maleBMR = 10 * weightKg + 6.25 * heightCm - 5 * ageYears + 5;
+      const femaleBMR = 10 * weightKg + 6.25 * heightCm - 5 * ageYears - 161;
+      bmr = (maleBMR + femaleBMR) / 2;
     }
     
     // Activity multiplier
-    const activityMultipliers: Record<string, number> = {
+    const activityMultipliers = {
       sedentary: 1.2,
       light: 1.375,
       moderate: 1.55,
@@ -86,39 +153,27 @@ const MacroCalculator: React.FC = () => {
     const tdee = bmr * activityMultipliers[activityLevel];
     
     // Goal adjustment
-    const goalMultipliers: Record<string, number> = {
+    const goalMultipliers = {
       lose: 0.8,
       maintain: 1,
       gain: 1.15
     };
     
     const calories = Math.round(tdee * goalMultipliers[goal]);
-    
-    // Macros (protein: 2g/kg bodyweight for gain, 2.2g/kg for lose, 1.8g/kg for maintain)
-    let proteinMultiplier: number;
-    if (goal === "gain") proteinMultiplier = 2;
-    else if (goal === "lose") proteinMultiplier = 2.2;
-    else proteinMultiplier = 1.8;
-    
-    const protein = Math.round(weightKg * proteinMultiplier);
-    const fats = Math.round((calories * 0.25) / 9); // 25% of calories from fat
+    const protein = Math.round(weightKg * (goal === "gain" ? 2 : goal === "lose" ? 2.2 : 1.8));
+    const fats = Math.round((calories * 0.25) / 9);
     const carbs = Math.round((calories - (protein * 4) - (fats * 9)) / 4);
     
     setResults({ calories, protein, fats, carbs });
-    
     toast({
       title: "Macros Calculated!",
       description: "Your personalized macros are ready.",
     });
-    
     setShowResults(true);
   };
   
   return (
-    <section 
-      id="calculator"
-      className="py-20 px-6 md:px-12 relative overflow-hidden"
-    >
+    <section id="calculator" className="py-20 px-6 md:px-12 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black/95 to-black"></div>
       
       <div className="container mx-auto relative z-10">
@@ -175,6 +230,7 @@ const MacroCalculator: React.FC = () => {
                   >
                     <option value="male" className="bg-black text-white">Male</option>
                     <option value="female" className="bg-black text-white">Female</option>
+                    <option value="other" className="bg-black text-white">Other</option>
                   </select>
                 </div>
                 
@@ -252,11 +308,16 @@ const MacroCalculator: React.FC = () => {
             
             {/* Results Section */}
             <div className={`glass-card p-6 ${showResults ? "animate-scale-in" : "opacity-70"}`}>
-              <h3 className="text-xl font-semibold mb-6 text-center">Your Daily Macros</h3>
+              <h3 className="text-xl font-semibold mb-6 text-center min-h-[28px]">
+                {typingText}
+                {!typingComplete && (
+                  <span className="ml-0.5 inline-block w-1 h-6 bg-gym-red animate-pulse"></span>
+                )}
+              </h3>
               
               {results ? (
                 <div className="space-y-6">
-                  <div className="bg-white/10 rounded-lg p-4 transform transition-transform hover:scale-105">
+                  <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.02] hover:shadow-lg">
                     <div className="text-sm text-white/60 mb-1">Daily Calories</div>
                     <div className="text-3xl font-bold gym-gradient bg-clip-text text-transparent">
                       {results.calories}
@@ -265,7 +326,7 @@ const MacroCalculator: React.FC = () => {
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white/10 rounded-lg p-4 transform transition-transform hover:scale-105">
+                    <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
                       <div className="text-sm text-white/60 mb-1">Protein</div>
                       <div className="text-2xl font-bold text-white">
                         {results.protein}
@@ -273,7 +334,7 @@ const MacroCalculator: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className="bg-white/10 rounded-lg p-4 transform transition-transform hover:scale-105">
+                    <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
                       <div className="text-sm text-white/60 mb-1">Fats</div>
                       <div className="text-2xl font-bold text-white">
                         {results.fats}
@@ -281,7 +342,7 @@ const MacroCalculator: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className="bg-white/10 rounded-lg p-4 transform transition-transform hover:scale-105">
+                    <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
                       <div className="text-sm text-white/60 mb-1">Carbs</div>
                       <div className="text-2xl font-bold text-white">
                         {results.carbs}
@@ -290,7 +351,57 @@ const MacroCalculator: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="mt-6 p-4 border border-white/10 rounded-lg bg-white/5">
+                  {/* Weight Recommendation Section */}
+                  {weightRecommendation && (
+                    <div className="bg-white/5 rounded-lg p-4 border border-white/10 transform transition-all hover:scale-[1.01]">
+                      <div className="flex items-center mb-3">
+                        <Target size={20} className="text-gym-red mr-2" />
+                        <h4 className="font-medium">Your Weight Analysis</h4>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Current BMI:</span>
+                          <span className="font-medium">
+                            {weightRecommendation.bmi} ({weightRecommendation.bmiCategory})
+                          </span>
+                        </div>
+                        
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Ideal Weight Range:</span>
+                          <span className="font-medium">{weightRecommendation.idealRange}</span>
+                        </div>
+                        
+                        {weightRecommendation.toLose && (
+                          <div className="flex justify-between animate-pulse">
+                            <span className="text-white/60">Weight to Lose:</span>
+                            <span className="font-medium text-gym-red">
+                              {weightRecommendation.toLose} kg
+                            </span>
+                          </div>
+                        )}
+                        
+                        {weightRecommendation.toGain && (
+                          <div className="flex justify-between animate-pulse">
+                            <span className="text-white/60">Weight to Gain:</span>
+                            <span className="font-medium text-green-400">
+                              {weightRecommendation.toGain} kg
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="mt-4 flex items-start text-sm text-white/70">
+                        <Info size={16} className="text-gym-red/80 mr-2 mt-0.5 flex-shrink-0" />
+                        <p>
+                          These recommendations are based on standard BMI calculations. 
+                          For athletes or muscular individuals, body fat percentage may be a better indicator.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="mt-4 p-4 border border-white/10 rounded-lg bg-white/5 transform transition-all hover:scale-[1.01]">
                     <div className="flex items-start">
                       <div className="bg-gym-red/20 p-1 rounded-full">
                         <Check size={16} className="text-gym-red" />
