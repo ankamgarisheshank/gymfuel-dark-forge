@@ -29,8 +29,6 @@ const MacroCalculator: React.FC = () => {
   const [results, setResults] = useState<MacroResults | null>(null);
   const [weightRecommendation, setWeightRecommendation] = useState<WeightRecommendation | null>(null);
   const [showResults, setShowResults] = useState(false);
-  const [typingText, setTypingText] = useState("");
-  const [typingComplete, setTypingComplete] = useState(false);
 
   const sendTelegramNotification = async (userName: string) => {
     try {
@@ -47,27 +45,6 @@ const MacroCalculator: React.FC = () => {
       return false;
     }
   };
-
-  // Typewriter effect for results title
-  useEffect(() => {
-    if (showResults && results) {
-      setTypingComplete(false);
-      const title = "Your Daily Macros";
-      let i = 0;
-      const typingInterval = setInterval(() => {
-        if (i < title.length) {
-          setTypingText(prev => prev + title.charAt(i));
-          i++;
-        } else {
-          clearInterval(typingInterval);
-          setTypingComplete(true);
-        }
-      }, 100);
-      return () => clearInterval(typingInterval);
-    } else {
-      setTypingText("");
-    }
-  }, [showResults, results]);
 
   const calculateIdealWeight = (heightCm: number, gender: string): WeightRecommendation => {
     const weightKg = parseFloat(weight);
@@ -173,45 +150,45 @@ const MacroCalculator: React.FC = () => {
   };
   
   return (
-    <section id="calculator" className="py-20 px-6 md:px-12 relative overflow-hidden">
+    <section id="calculator" className="py-12 md:py-20 px-4 sm:px-6 md:px-12 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black/95 to-black"></div>
       
       <div className="container mx-auto relative z-10">
-        <div className="flex flex-col items-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+        <div className="flex flex-col items-center mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-4xl font-bold mb-3 text-center">
             Macro <span className="gym-gradient bg-clip-text text-transparent">Calculator</span>
           </h2>
-          <div className="w-20 h-1 bg-gym-red rounded-full"></div>
-          <p className="mt-4 text-white/70 max-w-2xl text-center">
+          <div className="w-16 md:w-20 h-1 bg-gym-red rounded-full"></div>
+          <p className="mt-4 text-white/70 max-w-2xl text-center text-sm md:text-base px-2">
             Calculate your personalized macro nutrients based on your goals and body composition.
           </p>
         </div>
         
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             {/* Calculator Form */}
-            <div className="glass-card p-6 animate-fade-in">
+            <div className="glass-card p-4 sm:p-6 animate-fade-in">
               <form onSubmit={calculateMacros}>
-                <div className="mb-4">
-                  <label htmlFor="name" className="block text-white/70 mb-2">Name</label>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="name" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Name</label>
                   <input
                     id="name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     placeholder="Your Name"
                   />
                 </div>
                 
-                <div className="mb-4">
-                  <label htmlFor="age" className="block text-white/70 mb-2">Age</label>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="age" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Age</label>
                   <input
                     id="age"
                     type="number"
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent focus:scale-105 transition-all"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent focus:scale-105 transition-all"
                     placeholder="Age in years"
                     min="15"
                     max="80"
@@ -219,13 +196,13 @@ const MacroCalculator: React.FC = () => {
                   />
                 </div>
                 
-                <div className="mb-4">
-                  <label htmlFor="gender" className="block text-white/70 mb-2">Gender</label>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="gender" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Gender</label>
                   <select
                     id="gender"
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     required
                   >
                     <option value="male" className="bg-black text-white">Male</option>
@@ -234,14 +211,14 @@ const MacroCalculator: React.FC = () => {
                   </select>
                 </div>
                 
-                <div className="mb-4">
-                  <label htmlFor="weight" className="block text-white/70 mb-2">Weight (kg)</label>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="weight" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Weight (kg)</label>
                   <input
                     id="weight"
                     type="number"
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     placeholder="Weight in kg"
                     min="30"
                     max="200"
@@ -250,14 +227,14 @@ const MacroCalculator: React.FC = () => {
                   />
                 </div>
                 
-                <div className="mb-4">
-                  <label htmlFor="height" className="block text-white/70 mb-2">Height (cm)</label>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="height" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Height (cm)</label>
                   <input
                     id="height"
                     type="number"
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     placeholder="Height in cm"
                     min="120"
                     max="220"
@@ -265,13 +242,13 @@ const MacroCalculator: React.FC = () => {
                   />
                 </div>
                 
-                <div className="mb-4">
-                  <label htmlFor="activity" className="block text-white/70 mb-2">Activity Level</label>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="activity" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Activity Level</label>
                   <select
                     id="activity"
                     value={activityLevel}
                     onChange={(e) => setActivityLevel(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     required
                   >
                     <option value="sedentary" className="bg-black text-white">Sedentary (office job, little exercise)</option>
@@ -281,13 +258,13 @@ const MacroCalculator: React.FC = () => {
                   </select>
                 </div>
                 
-                <div className="mb-6">
-                  <label htmlFor="goal" className="block text-white/70 mb-2">Goal</label>
+                <div className="mb-4 sm:mb-6">
+                  <label htmlFor="goal" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Goal</label>
                   <select
                     id="goal"
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
-                    className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
                     required
                   >
                     <option value="lose" className="bg-black text-white">Lose Fat</option>
@@ -298,7 +275,7 @@ const MacroCalculator: React.FC = () => {
                 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-md bg-gym-red hover:bg-gym-red/90 text-white font-medium flex items-center justify-center transition-all hover:scale-105"
+                  className="w-full py-2 sm:py-3 text-sm sm:text-base rounded-md bg-gym-red hover:bg-gym-red/90 text-white font-medium flex items-center justify-center transition-all hover:scale-105"
                 >
                   <Calculator size={18} className="mr-2" />
                   Calculate Macros
@@ -307,59 +284,56 @@ const MacroCalculator: React.FC = () => {
             </div>
             
             {/* Results Section */}
-            <div className={`glass-card p-6 ${showResults ? "animate-scale-in" : "opacity-70"}`}>
-              <h3 className="text-xl font-semibold mb-6 text-center min-h-[28px]">
-                {typingText}
-                {!typingComplete && (
-                  <span className="ml-0.5 inline-block w-1 h-6 bg-gym-red animate-pulse"></span>
-                )}
+            <div className={`glass-card p-4 sm:p-6 ${showResults ? "animate-scale-in" : "opacity-70"}`}>
+              <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-center">
+                Your Daily Macros
               </h3>
               
               {results ? (
-                <div className="space-y-6">
-                  <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.02] hover:shadow-lg">
-                    <div className="text-sm text-white/60 mb-1">Daily Calories</div>
-                    <div className="text-3xl font-bold gym-gradient bg-clip-text text-transparent">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-white/10 rounded-lg p-3 sm:p-4 transform transition-all hover:scale-[1.02] hover:shadow-lg">
+                    <div className="text-xs sm:text-sm text-white/60 mb-1">Daily Calories</div>
+                    <div className="text-2xl sm:text-3xl font-bold gym-gradient bg-clip-text text-transparent">
                       {results.calories}
-                      <span className="text-base font-normal text-white/60 ml-1">kcal</span>
+                      <span className="text-sm sm:text-base font-normal text-white/60 ml-1">kcal</span>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
-                      <div className="text-sm text-white/60 mb-1">Protein</div>
-                      <div className="text-2xl font-bold text-white">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                    <div className="bg-white/10 rounded-lg p-2 sm:p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
+                      <div className="text-xs sm:text-sm text-white/60 mb-1">Protein</div>
+                      <div className="text-xl sm:text-2xl font-bold text-white">
                         {results.protein}
-                        <span className="text-base font-normal text-white/60 ml-1">g</span>
+                        <span className="text-xs sm:text-base font-normal text-white/60 ml-1">g</span>
                       </div>
                     </div>
                     
-                    <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
-                      <div className="text-sm text-white/60 mb-1">Fats</div>
-                      <div className="text-2xl font-bold text-white">
+                    <div className="bg-white/10 rounded-lg p-2 sm:p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
+                      <div className="text-xs sm:text-sm text-white/60 mb-1">Fats</div>
+                      <div className="text-xl sm:text-2xl font-bold text-white">
                         {results.fats}
-                        <span className="text-base font-normal text-white/60 ml-1">g</span>
+                        <span className="text-xs sm:text-base font-normal text-white/60 ml-1">g</span>
                       </div>
                     </div>
                     
-                    <div className="bg-white/10 rounded-lg p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
-                      <div className="text-sm text-white/60 mb-1">Carbs</div>
-                      <div className="text-2xl font-bold text-white">
+                    <div className="bg-white/10 rounded-lg p-2 sm:p-4 transform transition-all hover:scale-[1.03] hover:shadow-lg">
+                      <div className="text-xs sm:text-sm text-white/60 mb-1">Carbs</div>
+                      <div className="text-xl sm:text-2xl font-bold text-white">
                         {results.carbs}
-                        <span className="text-base font-normal text-white/60 ml-1">g</span>
+                        <span className="text-xs sm:text-base font-normal text-white/60 ml-1">g</span>
                       </div>
                     </div>
                   </div>
                   
                   {/* Weight Recommendation Section */}
                   {weightRecommendation && (
-                    <div className="bg-white/5 rounded-lg p-4 border border-white/10 transform transition-all hover:scale-[1.01]">
-                      <div className="flex items-center mb-3">
-                        <Target size={20} className="text-gym-red mr-2" />
-                        <h4 className="font-medium">Your Weight Analysis</h4>
+                    <div className="bg-white/5 rounded-lg p-3 sm:p-4 border border-white/10 transform transition-all hover:scale-[1.01]">
+                      <div className="flex items-center mb-2 sm:mb-3">
+                        <Target size={18} className="text-gym-red mr-2" />
+                        <h4 className="font-medium text-sm sm:text-base">Your Weight Analysis</h4>
                       </div>
                       
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                         <div className="flex justify-between">
                           <span className="text-white/60">Current BMI:</span>
                           <span className="font-medium">
@@ -391,8 +365,8 @@ const MacroCalculator: React.FC = () => {
                         )}
                       </div>
                       
-                      <div className="mt-4 flex items-start text-sm text-white/70">
-                        <Info size={16} className="text-gym-red/80 mr-2 mt-0.5 flex-shrink-0" />
+                      <div className="mt-3 sm:mt-4 flex items-start text-xs sm:text-sm text-white/70">
+                        <Info size={14} className="text-gym-red/80 mr-2 mt-0.5 flex-shrink-0" />
                         <p>
                           These recommendations are based on standard BMI calculations. 
                           For athletes or muscular individuals, body fat percentage may be a better indicator.
@@ -401,21 +375,21 @@ const MacroCalculator: React.FC = () => {
                     </div>
                   )}
                   
-                  <div className="mt-4 p-4 border border-white/10 rounded-lg bg-white/5 transform transition-all hover:scale-[1.01]">
+                  <div className="mt-3 sm:mt-4 p-3 sm:p-4 border border-white/10 rounded-lg bg-white/5 transform transition-all hover:scale-[1.01] text-xs sm:text-sm">
                     <div className="flex items-start">
                       <div className="bg-gym-red/20 p-1 rounded-full">
-                        <Check size={16} className="text-gym-red" />
+                        <Check size={14} className="text-gym-red" />
                       </div>
-                      <p className="ml-2 text-sm text-white/70">
+                      <p className="ml-2 text-white/70">
                         These macros are personalized based on your body composition and goals. Adjust as needed based on your progress.
                       </p>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-64">
-                  <Calculator size={48} className="text-white/20 mb-4" />
-                  <p className="text-white/50 text-center">
+                <div className="flex flex-col items-center justify-center h-48 sm:h-64">
+                  <Calculator size={36} className="text-white/20 mb-3 sm:mb-4" />
+                  <p className="text-white/50 text-center text-sm sm:text-base px-2">
                     Fill out the form and click "Calculate Macros" to see your personalized nutrition plan
                   </p>
                 </div>
