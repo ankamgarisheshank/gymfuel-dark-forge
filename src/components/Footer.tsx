@@ -12,24 +12,29 @@ const Footer: React.FC = () => {
           <div className="flex flex-col items-center mb-6 md:mb-0">
             {/* Image */}
             <img
-              src="https://res.cloudinary.com/dnbqgzh4t/image/upload/v1746033325/qds3xba9ww3ni7ir9ohw.jpg" // Replace with the actual image path
+              src="https://res.cloudinary.com/dnbqgzh4t/image/upload/v1746033325/qds3xba9ww3ni7ir9ohw.jpg"
               alt="Developer"
               className="w-24 h-24 rounded-full mb-3 object-cover"
             />
-            {/* Name and Description */}
-            <span className="text-white/70 text-sm text-center">
-              This website is developed by <strong>ANKAMGARI SHESHANK GOUD</strong>
-            </span>
-            <span className="text-white/50 text-xs mt-1 text-center">
-              Passionate about building user-friendly and scalable web applications.
-            </span>
+            {/* Name and Description - Updated for mobile */}
+            <div className="text-center">
+              <span className="text-white/70 text-sm block">
+                This website is developed by
+              </span>
+              <strong className="text-white/70 text-sm whitespace-nowrap">
+                ANKAMGARI SHESHANK GOUD
+              </strong>
+              <span className="text-white/50 text-xs mt-1 block">
+                Passionate about building user-friendly and scalable web applications.
+              </span>
+            </div>
           </div>
 
-          {/* Links Section */}
+          {/* Links Section - Reordered and updated icons */}
           <div className="flex space-x-4">
-            {/* GitHub Link */}
+            {/* Instagram Link */}
             <a
-              href=" https://github.com/ankamgarisheshank" // Replace with your GitHub profile link
+              href="https://www.instagram.com/.bunny04.?igsh=MWgybnphemNleXB5Mg%3D%3D&utm_source=qr" // Replace with your Instagram link
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
@@ -45,13 +50,15 @@ const Footer: React.FC = () => {
                 strokeLinejoin="round"
                 className="text-white/80"
               >
-                <path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.66-.22.66-.49v-1.7c-2.78.61-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.52 9.52 0 0 1 12 6.8c.85.004 1.71.11 2.51.32 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.75c0 .27.16.59.67.49A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"></path>
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
               </svg>
             </a>
 
             {/* LinkedIn Link */}
             <a
-              href="https://www.linkedin.com/in/ankamgari-sheshank/" // Replace with your LinkedIn profile link
+              href="https://www.linkedin.com/in/ankamgari-sheshank/"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
@@ -73,9 +80,9 @@ const Footer: React.FC = () => {
               </svg>
             </a>
 
-            {/* Portfolio Link */}
+            {/* Portfolio Link - Now with Globe/Website icon */}
             <a
-              href="http://ankamgarisheshank-profile.netlify.app" // Replace with your portfolio link
+              href="http://ankamgarisheshank-profile.netlify.app"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
@@ -91,10 +98,31 @@ const Footer: React.FC = () => {
                 strokeLinejoin="round"
                 className="text-white/80"
               >
-                <path d="M12 2l9 4.5-9 4.5-9-4.5L12 2z"></path>
-                <path d="M12 22V12"></path>
-                <path d="M12 12l9-4.5"></path>
-                <path d="M3 7.5l9 4.5"></path>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </a>
+
+            {/* GitHub Link */}
+            <a
+              href="https://github.com/ankamgarisheshank"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-white/80"
+              >
+                <path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.66-.22.66-.49v-1.7c-2.78.61-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.52 9.52 0 0 1 12 6.8c.85.004 1.71.11 2.51.32 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.75c0 .27.16.59.67.49A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"></path>
               </svg>
             </a>
           </div>

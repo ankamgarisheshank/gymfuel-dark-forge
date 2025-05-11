@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Calculator, Check, Info, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,6 +24,8 @@ const MacroCalculator: React.FC = () => {
   const [gender, setGender] = useState("male");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
+  const [heightUnit, setHeightUnit] = useState<"cm" | "ft">("cm");
+  const [feet, setFeet] = useState("");
   const [activityLevel, setActivityLevel] = useState("moderate");
   const [goal, setGoal] = useState("maintain");
   const [results, setResults] = useState<MacroResults | null>(null);
@@ -87,11 +89,24 @@ const MacroCalculator: React.FC = () => {
     };
   };
 
+  const convertToCm = (feet: string): number => {
+    const feetValue = parseFloat(feet) || 0;
+    return Math.round(feetValue * 30.48);
+  };
+
   const calculateMacros = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const weightKg = parseFloat(weight);
-    const heightCm = parseFloat(height);
+    let heightCm;
+    
+    if (heightUnit === "cm") {
+      heightCm = parseFloat(height);
+    } else {
+      heightCm = convertToCm(feet);
+      setHeight(heightCm.toString());
+    }
+    
     const ageYears = parseFloat(age);
     
     if (!name) {
@@ -120,7 +135,7 @@ const MacroCalculator: React.FC = () => {
     }
     
     // Activity multiplier
-    const activityMultipliers = {
+    const activityMultipliers: Record<string, number> = {
       sedentary: 1.2,
       light: 1.375,
       moderate: 1.55,
@@ -130,7 +145,7 @@ const MacroCalculator: React.FC = () => {
     const tdee = bmr * activityMultipliers[activityLevel];
     
     // Goal adjustment
-    const goalMultipliers = {
+    const goalMultipliers: Record<string, number> = {
       lose: 0.8,
       maintain: 1,
       gain: 1.15
@@ -228,18 +243,53 @@ const MacroCalculator: React.FC = () => {
                 </div>
                 
                 <div className="mb-3 sm:mb-4">
-                  <label htmlFor="height" className="block text-white/70 mb-1 sm:mb-2 text-sm sm:text-base">Height (cm)</label>
-                  <input
-                    id="height"
-                    type="number"
-                    value={height}
-                    onChange={(e) => setHeight(e.target.value)}
-                    className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
-                    placeholder="Height in cm"
-                    min="120"
-                    max="220"
-                    required
-                  />
+                  <div className="flex justify-between items-center mb-1 sm:mb-2">
+                    <label htmlFor="height" className="block text-white/70 text-sm sm:text-base">
+                      Height
+                    </label>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        className={`text-xs px-2 py-1 rounded ${heightUnit === "cm" ? "bg-gym-red text-white" : "bg-white/10 text-white/70"}`}
+                        onClick={() => setHeightUnit("cm")}
+                      >
+                        cm
+                      </button>
+                      <button
+                        type="button"
+                        className={`text-xs px-2 py-1 rounded ${heightUnit === "ft" ? "bg-gym-red text-white" : "bg-white/10 text-white/70"}`}
+                        onClick={() => setHeightUnit("ft")}
+                      >
+                        ft
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {heightUnit === "cm" ? (
+                    <input
+                      id="height"
+                      type="number"
+                      value={height}
+                      onChange={(e) => setHeight(e.target.value)}
+                      className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                      placeholder="Height in cm"
+                      min="120"
+                      max="220"
+                      required
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      value={feet}
+                      onChange={(e) => setFeet(e.target.value)}
+                      className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base rounded-md bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-gym-red/50 focus:border-transparent transition-all"
+                      placeholder="Height in feet"
+                      min="4"
+                      max="7"
+                      step="0.1"
+                      required
+                    />
+                  )}
                 </div>
                 
                 <div className="mb-3 sm:mb-4">
