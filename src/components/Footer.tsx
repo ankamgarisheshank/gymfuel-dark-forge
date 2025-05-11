@@ -34,7 +34,7 @@ const Footer: React.FC = () => {
           <div className="flex space-x-4">
             {/* Instagram Link */}
             <a
-              href="https://www.instagram.com/.bunny04.?igsh=MWgybnphemNleXB5Mg%3D%3D&utm_source=qr" // Replace with your Instagram link
+              href="https://www.instagram.com/_.bunny04._/" // Replace with your Instagram link
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
